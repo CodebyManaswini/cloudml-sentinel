@@ -5,12 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CloudML Sentinel</title>
   <style>
-    body { font-family: Arial, sans-serif; background: linear-gradient(to right, #667eea, #764ba2); color: white; text-align: center; padding: 50px; }
-    .container { max-width: 600px; margin: auto; background: rgba(0,0,0,0.3); padding: 30px; border-radius: 15px; }
-    input { width: 80%; padding: 15px; margin: 20px 0; border: none; border-radius: 8px; font-size: 18px; }
-    button { padding: 15px 30px; font-size: 18px; background: #ff6b6b; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    body { 
+      font-family: Arial, sans-serif; 
+      background: linear-gradient(to right, #667eea, #764ba2); 
+      color: white; 
+      text-align: center; 
+      padding: 50px; 
+    }
+    .container { 
+      max-width: 600px; 
+      margin: auto; 
+      background: rgba(0,0,0,0.3); 
+      padding: 40px; 
+      border-radius: 15px; 
+    }
+    input { 
+      width: 80%; 
+      padding: 15px; 
+      margin: 20px 0; 
+      border: none; 
+      border-radius: 8px; 
+      font-size: 18px; 
+    }
+    button { 
+      padding: 15px 40px; 
+      font-size: 18px; 
+      background: #ff6b6b; 
+      color: white; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+    }
     button:hover { background: #ff5252; }
-    #result { margin-top: 20px; font-size: 24px; min-height: 50px; }
+    #result { 
+      margin-top: 25px; 
+      font-size: 26px; 
+      min-height: 60px; 
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -19,7 +51,7 @@
     <h2>Sentiment Analysis</h2>
     
     <input type="text" id="textInput" placeholder="Type your text here..." />
-    <br>
+    <br><br>
     <button onclick="analyzeSentiment()">Analyze Sentiment</button>
     
     <div id="result"></div>
@@ -27,15 +59,17 @@
 
   <script>
     async function analyzeSentiment() {
-      const text = document.getElementById('textInput').value;
+      const text = document.getElementById('textInput').value.trim();
       const resultDiv = document.getElementById('result');
       
       if (!text) {
         resultDiv.innerHTML = "Please enter some text!";
+        resultDiv.style.color = "yellow";
         return;
       }
 
       resultDiv.innerHTML = "Analyzing...";
+      resultDiv.style.color = "white";
 
       try {
         const response = await fetch('/predict', {
@@ -43,18 +77,21 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text: text })
         });
-        
+
+        if (!response.ok) throw new Error('API Error');
+
         const data = await response.json();
         
         const color = data.sentiment === 'POSITIVE' ? '#90EE90' : '#FF6B6B';
         resultDiv.innerHTML = `
-          <strong>${data.sentiment}</strong> (${(data.confidence * 100).toFixed(2)}%)<br>
-          <small>Model: ${data.model}</small>
+          <strong>${data.sentiment}</strong> (${(data.confidence * 100).toFixed(1)}%)<br>
+          <small style="font-size:14px">Model: ${data.model}</small>
         `;
         resultDiv.style.color = color;
       } catch (error) {
-        resultDiv.innerHTML = "Error connecting to server.<br>Make sure Docker container is running.";
-        resultDiv.style.color = "yellow";
+        resultDiv.innerHTML = "Cannot connect to backend.<br>Check if pods are Running.";
+        resultDiv.style.color = "#FF6B6B";
+        console.error(error);
       }
     }
   </script>
