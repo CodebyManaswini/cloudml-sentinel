@@ -1,10 +1,12 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from src.models.sentiment import analyze_sentiment
 
 app = FastAPI(title="CloudML Sentinel - Sentiment Analysis", version="1.0.0")
 
+# Serve static files
 app.mount("/static", StaticFiles(directory="src/app/static"), name="static")
 
 class SentimentRequest(BaseModel):
@@ -20,14 +22,10 @@ async def predict_sentiment(request: SentimentRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/")
+async def home():
+    return RedirectResponse(url="/static/index.html")
+
 @app.get("/health")
 async def health():
     return {"status": "healthy"}
-
-@app.get("/")
-async def home():
-    return """
-    <html>
-        <head><meta http-equiv="refresh" content="0; url=/static/index.html"></head>
-    </html>
-    """
