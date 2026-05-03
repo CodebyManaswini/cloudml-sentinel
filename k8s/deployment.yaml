@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudml-sentinel
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cloudml-sentinel
+  template:
+    metadata:
+      labels:
+        app: cloudml-sentinel
+    spec:
+      containers:
+      - name: sentinel
+        image: yourusername/cloudml-sentinel:v2   # Change to your Docker Hub username
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "512Mi"

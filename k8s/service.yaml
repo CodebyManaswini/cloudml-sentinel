@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudml-sentinel
+spec:
+  selector:
+    app: cloudml-sentinel
+  ports:
+  - port: 80
+    targetPort: 8000
+  type: LoadBalancer
