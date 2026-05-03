@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: sentinel
-        image: yourusername/cloudml-sentinel:v2   # Change to your Docker Hub username
+        image: manaswini6/cloudml-sentinel:v3
         ports:
         - containerPort: 8000
         resources:
