@@ -28,7 +28,7 @@ jobs:
       - name: Deploy Full Stack (App + Prometheus + Grafana)
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: 52.23.152.193
+          host: 107.21.169.139
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
