@@ -1,0 +1,38 @@
+name: CloudML Sentinel CI/CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: manaswini6i
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: manaswini6i/cloudml-sentinel:v4
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 54.158.139.173
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker pull manaswini6i/cloudml-sentinel:v4
+            docker stop cloudml-sentinel || true
+            docker rm cloudml-sentinel || true
+            docker run -d -p 8000:8000 --name cloudml-sentinel manaswini6i/cloudml-sentinel:v4
