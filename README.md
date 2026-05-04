@@ -1,0 +1,1 @@
+This project is a part of MLops where the sentiment analysis project is deployed through CI/CD pipeline.
