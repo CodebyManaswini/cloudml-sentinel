@@ -5,12 +5,13 @@ from pydantic import BaseModel
 from src.models.sentiment import analyze_sentiment
 from prometheus_fastapi_instrumentator import Instrumentator
 
-app = FastAPI(title="CloudML Sentinel - Sentiment Analysis", version="1.0.0")
-
-Instrumentator().instrument(app).expose(app)
+app = FastAPI(title="CloudML Sentinel", version="1.0.0")
 
 # Serve static files
 app.mount("/static", StaticFiles(directory="src/app/static"), name="static")
+
+# Important: Add Prometheus Instrumentation
+Instrumentator().instrument(app).expose(app)
 
 class SentimentRequest(BaseModel):
     text: str
@@ -32,7 +33,3 @@ async def home():
 @app.get("/health")
 async def health():
     return {"status": "healthy"}
-
-@app.get("/metrics")
-async def metrics():
-    return Instrumentator().expose(app)
