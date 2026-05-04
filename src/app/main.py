@@ -3,8 +3,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from src.models.sentiment import analyze_sentiment
+from prometheus_fastapi_instrumentator import Instrumentator
 
 app = FastAPI(title="CloudML Sentinel - Sentiment Analysis", version="1.0.0")
+
+Instrumentator().instrument(app).expose(app)
 
 # Serve static files
 app.mount("/static", StaticFiles(directory="src/app/static"), name="static")
@@ -29,3 +32,7 @@ async def home():
 @app.get("/health")
 async def health():
     return {"status": "healthy"}
+
+@app.get("/metrics")
+async def metrics():
+    return Instrumentator().expose(app)

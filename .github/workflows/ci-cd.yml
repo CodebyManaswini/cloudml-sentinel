@@ -25,14 +25,18 @@ jobs:
           push: true
           tags: manaswini6i/cloudml-sentinel:v4
 
-      - name: Deploy to EC2
+      - name: Deploy Full Stack (App + Prometheus + Grafana)
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: 52.23.152.193
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker pull manaswini6i/cloudml-sentinel:v4
-            docker stop cloudml-sentinel || true
-            docker rm cloudml-sentinel || true
-            docker run -d -p 8000:8000 --name cloudml-sentinel manaswini6i/cloudml-sentinel:v4
+            cd ~/cloudml-sentinel || (mkdir -p ~/cloudml-sentinel && cd ~/cloudml-sentinel)
+            git pull origin main || true
+            docker compose down || true
+            docker compose up -d --build
+            echo "✅ Full Stack Deployed Successfully!"
+            echo "🌐 App        → http://$(curl -s ifconfig.me):8000"
+            echo "📊 Prometheus → http://$(curl -s ifconfig.me):9090"
+            echo "📈 Grafana    → http://$(curl -s ifconfig.me):3000"
