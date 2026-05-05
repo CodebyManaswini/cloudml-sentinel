@@ -1,6 +1,6 @@
 services:
   app:
-    image: manaswini6i/cloudml-sentinel:latest     
+    image: manaswini6i/cloudml-sentinel:latest
     container_name: cloudml-sentinel
     ports:
       - "8000:8000"
