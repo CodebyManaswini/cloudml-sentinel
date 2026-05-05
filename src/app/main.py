@@ -4,12 +4,12 @@ from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from prometheus_fastapi_instrumentator import Instrumentator
 
-
 from src.models.sentiment import analyze_sentiment
 
 app = FastAPI(title="CloudML Sentinel", version="1.0.0")
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# ✅ Correct static files path
+app.mount("/static", StaticFiles(directory="src/app/static"), name="static")
 
 Instrumentator().instrument(app).expose(app)
 
