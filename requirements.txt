@@ -1,6 +1,7 @@
 fastapi
-uvicorn
+uvicorn[standard]
 python-multipart
-prometheus-client
 transformers
+prometheus-fastapi-instrumentator
+prometheus-client
 torch

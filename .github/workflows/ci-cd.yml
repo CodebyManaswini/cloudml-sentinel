@@ -18,25 +18,32 @@ jobs:
           username: manaswini6i
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          tags: manaswini6i/cloudml-sentinel:v4
+          tags: manaswini6i/cloudml-sentinel:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: Deploy Full Stack (App + Prometheus + Grafana)
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: 107.21.169.139
+          host: 34.229.243.231                    
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/cloudml-sentinel || (mkdir -p ~/cloudml-sentinel && cd ~/cloudml-sentinel)
+            cd ~/cloudml-sentinel || mkdir -p ~/cloudml-sentinel && cd ~/cloudml-sentinel
+            
             git pull origin main || true
+            
+            # Pull latest image and restart services
+            docker compose pull
             docker compose down || true
-            docker compose up -d --build
-            echo "✅ Full Stack Deployed Successfully!"
+            docker compose up -d
+            
+            echo "✅ Deployment Successful!"
             echo "🌐 App        → http://$(curl -s ifconfig.me):8000"
             echo "📊 Prometheus → http://$(curl -s ifconfig.me):9090"
             echo "📈 Grafana    → http://$(curl -s ifconfig.me):3000"
