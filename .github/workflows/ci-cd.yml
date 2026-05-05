@@ -32,27 +32,22 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            echo "🚀 Starting Deployment..."
-
             cd ~/cloudml-sentinel || (mkdir -p ~/cloudml-sentinel && cd ~/cloudml-sentinel)
             
-            echo "📥 Pulling latest code from GitHub..."
+            echo "📥 Pulling latest code..."
             git fetch --all
             git reset --hard origin/main
             
-            echo "📥 Pulling latest Docker image..."
-            docker-compose pull || true
+            echo "📥 Pulling latest image..."
+            docker compose pull
             
-            echo "🛑 Stopping existing services..."
-            docker-compose down || true
-            
-            echo "🧹 Cleaning old images..."
-            docker image prune -f || true
+            echo "🛑 Stopping old services..."
+            docker compose down || true
             
             echo "🚀 Starting all services..."
-            docker-compose up -d
+            docker compose up -d
             
-            echo "✅ Deployment Completed Successfully!"
+            echo "✅ Deployment Successful!"
             echo "🌐 App        → http://$(curl -s ifconfig.me):8000"
             echo "📊 Prometheus → http://$(curl -s ifconfig.me):9090"
             echo "📈 Grafana    → http://$(curl -s ifconfig.me):3000"
