@@ -25,26 +25,34 @@ jobs:
           push: true
           tags: manaswini6i/cloudml-sentinel:latest
 
-      - name: Deploy to EC2 (App + Prometheus + Grafana)
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: 34.229.243.231              # ← Change if your IP changes
+          host: 34.229.243.231
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            echo "🚀 Starting Deployment..."
+
             cd ~/cloudml-sentinel || (mkdir -p ~/cloudml-sentinel && cd ~/cloudml-sentinel)
             
-            git pull origin main || true
+            echo "📥 Pulling latest code from GitHub..."
+            git fetch --all
+            git reset --hard origin/main
             
-            docker compose pull
+            echo "📥 Pulling latest Docker image..."
+            docker-compose pull || true
             
-            docker compose down || true
+            echo "🛑 Stopping existing services..."
+            docker-compose down || true
             
-            docker image prune -f
+            echo "🧹 Cleaning old images..."
+            docker image prune -f || true
             
-            docker compose up -d
+            echo "🚀 Starting all services..."
+            docker-compose up -d
             
-            echo "✅ Deployment Successful!"
+            echo "✅ Deployment Completed Successfully!"
             echo "🌐 App        → http://$(curl -s ifconfig.me):8000"
             echo "📊 Prometheus → http://$(curl -s ifconfig.me):9090"
             echo "📈 Grafana    → http://$(curl -s ifconfig.me):3000"
